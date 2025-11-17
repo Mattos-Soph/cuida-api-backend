@@ -1,4 +1,7 @@
-fastapi
-uvicorn
+flask
+gunicorn
 reportlab
+supabase
+python-dotenv
 qrcode[pil]
+requests
