@@ -19,7 +19,8 @@ import io
 # ==============================================================================
 # FUNÇÃO PRINCIPAL (A MÁQUINA DE PDF)
 # ==============================================================================
-def gerar_documento_base(titulo_doc, referencia, data, conteudo, caminho_salvar):
+# 🌟 CORREÇÃO 1: Adicionado 'subtitulo_extra=None' na assinatura da função
+def gerar_documento_base(titulo_doc, referencia, data, conteudo, caminho_salvar, subtitulo_extra=None):
     """
     Função genérica que monta o layout padrão da Prefeitura de Marília.
     """
@@ -64,13 +65,19 @@ def gerar_documento_base(titulo_doc, referencia, data, conteudo, caminho_salvar)
     elementos.append(Paragraph("Prefeitura Municipal de Marília", estilo_titulo))
     elementos.append(Paragraph("Secretaria Municipal de Saúde", estilo_subtitulo))
     elementos.append(Paragraph(titulo_doc, estilo_subtitulo))
+    
+    # 🌟 CORREÇÃO 2: Exibir o nome da unidade (subtítulo extra)
+    if subtitulo_extra:
+        elementos.append(Paragraph(f"Unidade de Filtro: <b>{subtitulo_extra}</b>", estilo_normal))
+        
     elementos.append(Paragraph(f"Referência: {referencia}", estilo_normal))
     elementos.append(Paragraph(f"Data de Emissão: {data}", estilo_data))
 
     # --- CORPO (TABELA OU TEXTO) ---
     if isinstance(conteudo, list):
         # Se for lista, desenha Tabela
-        tabela = Table(conteudo, colWidths=[5 * cm, 6 * cm, 4 * cm]) # Ajustei larguras
+        # 🌟 CORREÇÃO 3: Largura ajustada para caber o nome do medicamento
+        tabela = Table(conteudo, colWidths=[9.5 * cm, 3.5 * cm, 2.0 * cm]) 
         tabela.setStyle(
             TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#004080")), # Azul Prefeitura
@@ -132,6 +139,8 @@ def gerar_laudo_auditoria(referencia, data, texto, caminho="laudo_auditoria.pdf"
     # Laudo geralmente é texto corrido, não tabela
     gerar_documento_base("Laudo de Auditoria Técnica", referencia, data, texto, caminho)
 
-def gerar_relatorio_saidas(referencia, data, saidas, caminho="relatorio_saidas.pdf"):
+# 🌟 CORREÇÃO FINAL: Adicionado 'unidade_destino=None' para ser usado como subtítulo extra
+def gerar_relatorio_saidas(referencia, data, saidas, unidade_destino=None, caminho="relatorio_saidas.pdf"):
     conteudo = [["Medicamento", "Unidade Destino", "Qtd. Enviada"]] + saidas
-    gerar_documento_base("Relatório de Saídas e Movimentação", referencia, data, conteudo, caminho)
+    # Chamando a base com o nome da unidade para o cabeçalho
+    gerar_documento_base("Relatório de Saídas e Movimentação", referencia, data, conteudo, caminho, subtitulo_extra=unidade_destino)
